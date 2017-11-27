@@ -1,8 +1,9 @@
 package com.tanrui;
 
-import java.util.Iterator;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class StudentList {
     public static class Students {
@@ -70,14 +71,35 @@ public class StudentList {
             return "考号：" + exam_num + " 姓名：" + name + " 性别：" + getSex() + " 年龄：" + age + " 报考类型：" + type;
         }
     };
-    private LinkedList studentList;
+    private LinkedList<Students> studentList;
     private Students first;
     public StudentList(){
-        this.studentList = new LinkedList();
+        this.studentList = new LinkedList<Students>();
         first = null;
     }
     public StudentList(LinkedList studentList) {
-        this.studentList = (LinkedList) studentList.clone();
+        this.studentList = (LinkedList<Students>) studentList.clone();
+        this.first = this.studentList.getFirst();
+        Students temp = first;
+        for (int i = 1; i < this.studentList.size(); i++){
+            temp.next = this.studentList.get(i);
+            temp = temp.next;
+        }
+    }
+    public int getListSize(){return studentList.size();}
+    public void insertStudent(BufferedReader fileReader) throws IOException {
+        String studentInfo = fileReader.readLine();
+        while (studentInfo != null){
+            String []infos = studentInfo.split(" ");
+            int num = Integer.parseInt(infos[0]);
+            String name = infos[1];
+            Boolean sex = infos[2].equals("male");
+            int age = Integer.parseInt(infos[3]);
+            String type = infos[4];
+            Students students = new Students(num, name, sex, age, type) ;
+            insertStudent(students);
+            studentInfo = fileReader.readLine();
+        }
     }
     public void insertStudent(Students students){
         if (isExist(students.exam_num)){
@@ -86,12 +108,14 @@ public class StudentList {
         }
         if (first == null){
             first = new Students(students.exam_num, students.name, students.sex, students.age, students.type);
+            studentList.add(first);
         }else {
             Students temp = first;
             while (temp.next!=null){
                 temp = temp.next;
             }
             temp.next = new Students(students.exam_num, students.name, students.sex, students.age, students.type);
+            studentList.add(temp.next);
         }
     }
     public boolean isExist(int num){
@@ -111,6 +135,11 @@ public class StudentList {
             temp = temp.next;
         }
     }
+    public void printListWithoutFirst(){
+        studentList.forEach(temp->{
+            System.out.printf("考号：%d 姓名：%s 性别：%s 年龄：%d 报考类型：%s%n", temp.exam_num, temp.name, temp.sex?"male":"female", temp.age, temp.type);
+        });
+    }
     public Students searchByNum(int num){
         Students temp = first;
         while (temp != null){
@@ -121,15 +150,74 @@ public class StudentList {
         }
         return null;
     }
-    public Students searchByName(String name){
+    public LinkedList<Students> searchByName(String name){
+        LinkedList<Students> students = new LinkedList<>();
+        int index = 0;
         Students temp = first;
         while (temp != null){
-            if (temp.getName() == name){
-                return temp;
+            if (temp.getName().equals(name)){
+                students.add(new Students(temp));
             }
             temp = temp.next;
         }
-        return null;
+        return students;
+    }
+    public LinkedList<Students> searchBySex(boolean sex){
+        LinkedList<Students> students = new LinkedList<>();
+        Students temp = first;
+        while (temp != null){
+            if (temp.sex == sex){
+                students.add(new Students(temp));
+            }
+            temp = temp.next;
+        }
+        return students;
     }
 
+    public LinkedList<Students> searchByAge(int age){
+        LinkedList<Students> students = new LinkedList<>();
+        Students temp = first;
+        while (temp != null){
+            if (temp.age == age){
+                students.add(new Students(temp));
+            }
+            temp = temp.next;
+        }
+        return students;
+    }
+    public LinkedList<Students> searchByType(String type){
+        LinkedList<Students> students = new LinkedList<>();
+        Students temp = first;
+        while (temp!=null){
+            if (temp.type.equals(type)){
+                students.add(new Students(temp));
+            }
+            temp = temp.next;
+        }
+        return students;
+    }
+
+    public boolean deleteByNum(int num){
+        if (!isExist(num)) return false;
+        else    {
+            Students temp = first.next, tempPre = first;
+            int index = 0;
+            if (tempPre.exam_num == num){
+                studentList.remove(0);
+                first = temp;
+                return true;
+            }
+            while (temp != null){
+                if (temp.exam_num == num){
+                    tempPre.next = temp.next;
+                    break;
+                }
+                tempPre = temp;
+                temp = temp.next;
+                index++;
+            }
+            studentList.remove(++index);
+            return true;
+        }
+    }
 }

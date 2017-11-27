@@ -1,0 +1,5 @@
+1 tanrui male 19 SSE
+2 liyang male 20 CAR
+3 xiaoxin male 21 TRA
+4 chenchao male 22 SSE
+5 tanrui female 21 ENG
