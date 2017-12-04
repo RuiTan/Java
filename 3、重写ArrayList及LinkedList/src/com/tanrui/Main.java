@@ -66,6 +66,15 @@ public class Main {
 //            });
 //            System.out.println(list.toArray());
 
+//          AVL二叉搜索树
+            AvlTree<Integer> avlTree = new AvlTree<>();
+            for (String num : nums){
+                avlTree.insert(Integer.parseInt(num));
+            }
+            System.out.println(avlTree.toString());
+            avlTree.insert(5);
+            System.out.println(avlTree.toString());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
